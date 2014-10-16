@@ -20,7 +20,7 @@ module Griddler
             text: event.fetch(:text, ''),
             html: event.fetch(:html, ''),
             raw_body: event[:raw_msg],
-            headers: event[:headers],
+            headers: extract_headers(event[:headers]),
             attachments: attachment_files(event)
           }
         end
@@ -69,6 +69,37 @@ module Griddler
         tempfile.rewind
         tempfile
       end
+
+
+      # https://github.com/bradpauly/griddler-mailgun/blob/8d28854ea60e1604c46c1673a660f8ad6fc32c41/lib/griddler/mailgun/adapter.rb
+
+        # Griddler expects unparsed headers to pass to ActionMailer, which will manually
+        # unfold, split on line-endings, and parse into individual fields.
+        #
+        # Mailgun already provides fully-parsed headers in JSON -- so we're reconstructing
+        # fake headers here for now, until we can find a better way to pass the parsed
+        # headers directly to Griddler
+
+
+      def extract_headers(input_headers)
+        extracted_headers = {}
+        if input_headers
+          parsed_headers = JSON.parse(input_headers)
+          parsed_headers.each{ |h| extracted_headers[h[0]] = h[1] }
+        end
+        new_headers = ActiveSupport::HashWithIndifferentAccess.new(extracted_headers)
+
+        serialized = new_headers.to_a.collect { |header| "#{header[0]}: #{header[1]}" }.join("\n")
+
+        puts "input_headers.inspect"
+        puts input_headers.inspect
+        puts serialized.inspect
+
+        serialized
+      end
+
+
+
     end
   end
 end
