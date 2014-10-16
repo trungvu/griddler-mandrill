@@ -4,7 +4,7 @@ module Griddler
       def initialize(params)
         puts "params.inspect"
         puts params.inspect
-        
+
         @params = params
       end
 
@@ -104,22 +104,15 @@ module Griddler
 
 
       def extract_headers(input_headers)
-        extracted_headers = {}
-        if input_headers
-          parsed_headers = JSON.parse(input_headers)
-          parsed_headers.each{ |h| extracted_headers[h[0]] = h[1] }
-        end
-        new_headers = ActiveSupport::HashWithIndifferentAccess.new(extracted_headers)
+        # extracted_headers = {}
+        # if input_headers
+        #   parsed_headers = JSON.parse(input_headers)
+        #   parsed_headers.each{ |h| extracted_headers[h[0]] = h[1] }
+        # end
+        # new_headers = ActiveSupport::HashWithIndifferentAccess.new(extracted_headers)
 
-        serialized = new_headers.to_a.collect { |header| "#{header[0]}: #{header[1]}" }.join("\n")
-
-        puts "input_headers.inspect"
-        puts input_headers.inspect
-        puts serialized.inspect
-
-        serialized
+        serialized = input_headers.to_a.collect { |header| "#{header[0]}: #{header[1]}" }.join("\n")
       end
-
 
 
     end
