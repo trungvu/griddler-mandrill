@@ -2,16 +2,24 @@ module Griddler
   module Mandrill
     class Adapter
       def initialize(params)
+        puts "params.inspect"
+        puts params.inspect
+        
         @params = params
       end
 
       def self.normalize_params(params)
         adapter = new(params)
         adapter.normalize_params
+
+        puts "adapter output"
+        puts adapter
+
+        adapter
       end
 
       def normalize_params
-        events.map do |event|
+        prams = events.map do |event|
           {
             to: recipients(:to, event),
             cc: recipients(:cc, event),
@@ -20,11 +28,16 @@ module Griddler
             text: event.fetch(:text, ''),
             html: event.fetch(:html, ''),
             raw_body: event[:raw_msg],
-            # headers: extract_headers(event[:headers]),
-            headers: event[:raw_msg],
+            headers: extract_headers(event[:headers]),
+            # headers: event[:raw_msg],
             attachments: attachment_files(event)
           }
         end
+
+        puts "prams.inspect"
+        puts prams.inspect
+
+        prams
       end
 
       private
@@ -35,6 +48,14 @@ module Griddler
         @events ||= ActiveSupport::JSON.decode(params[:mandrill_events]).map do |event|
           event['msg'].with_indifferent_access
         end
+
+        puts "@events.inspect"
+        puts @events.inspect
+
+        puts "@events[:headers].inspect"
+        puts @events[:headers].inspect
+
+        @events
       end
 
       def recipients(field, event)
